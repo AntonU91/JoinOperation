@@ -10,9 +10,11 @@ public class Main {
         leftCollection.add(new DataRow<>(3, "London"));
 
         ArrayList<DataRow<Integer, String>> rightCollection = new ArrayList<>();
-        rightCollection.add(new DataRow<>(1, "Ukraine"));
-        rightCollection.add(new DataRow<>(2, "Hungary"));
-        rightCollection.add(new DataRow<>(4,"Germany"));
+//        rightCollection.add(new DataRow<>(1, "Ukraine"));
+//        rightCollection.add(new DataRow<>(2, "Hungary"));
+//        rightCollection.add(new DataRow<>(4,"Germany"));
+        rightCollection.add(new DataRow<>(null, null));
+        rightCollection.add(new DataRow<>(null, null));
 
         Collection<JoinedDataRow<Integer, String, String>> innerJoin = JoinedDataRow.innerJoin(leftCollection, rightCollection, joinOperation);
         for (JoinedDataRow<Integer, String, String> joinedDataRow : innerJoin) {

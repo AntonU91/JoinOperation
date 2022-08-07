@@ -1,4 +1,8 @@
+import com.sun.istack.internal.NotNull;
+
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class JoinedDataRow<K, V1, V2> {
     private K key;
@@ -13,6 +17,7 @@ public class JoinedDataRow<K, V1, V2> {
     }
 
     public static Collection<JoinedDataRow<Integer, String, String>> innerJoin(Collection<DataRow<Integer, String>> leftCollection, Collection<DataRow<Integer, String>> rightCollection, JoinOperation joinOperation) {
+        checkCollectionsForNullValueKey(leftCollection, rightCollection);
         Collection<JoinedDataRow<Integer, String, String>> joinedDataRow = new ArrayList<>();
         joinOperation = (left, right) -> {
             for (DataRow<Integer, String> dataRowLeft : leftCollection) {
@@ -29,6 +34,7 @@ public class JoinedDataRow<K, V1, V2> {
 
     public static Collection<JoinedDataRow<Integer, String, String>> leftJoin(Collection<DataRow<Integer, String>> leftCollection, Collection<DataRow<Integer, String>> rightCollection,
                                                                               JoinOperation joinOperation) {
+        checkCollectionsForNullValueKey(leftCollection, rightCollection);
         Collection<JoinedDataRow<Integer, String, String>> joinedDataRow = new ArrayList<>();
         joinOperation = (left, right) -> {
             for (DataRow<Integer, String> dataRowLeft : leftCollection) {
@@ -49,13 +55,14 @@ public class JoinedDataRow<K, V1, V2> {
         return joinOperation.join(leftCollection, rightCollection);
     }
 
-    public static Collection<JoinedDataRow<Integer, String, String>> rightJoin(Collection<DataRow<Integer, String>> leftList, Collection<DataRow<Integer, String>> rightList,
-                                                                              JoinOperation joinOperation) {
+    public static Collection<JoinedDataRow<Integer, String, String>> rightJoin(Collection<DataRow<Integer, String>> leftCollection, Collection<DataRow<Integer, String>> rightCollection,
+                                                                               JoinOperation joinOperation) {
+        checkCollectionsForNullValueKey(leftCollection, rightCollection);
         Collection<JoinedDataRow<Integer, String, String>> joinedDataRow = new ArrayList<>();
         joinOperation = (left, right) -> {
-            for (DataRow<Integer, String> dataRowRight : rightList) {
+            for (DataRow<Integer, String> dataRowRight : rightCollection) {
                 boolean keyMatching = false;
-                for (DataRow<Integer, String> dataRowLeft : leftList) {
+                for (DataRow<Integer, String> dataRowLeft : leftCollection) {
                     if (dataRowRight.getKey().equals(dataRowLeft.getKey())) {
                         keyMatching = true;
                         joinedDataRow.add(new JoinedDataRow<>(dataRowRight.getKey(), dataRowLeft.getValue(), dataRowRight.getValue()));
@@ -68,11 +75,15 @@ public class JoinedDataRow<K, V1, V2> {
             }
             return joinedDataRow;
         };
-        return joinOperation.join(leftList, rightList);
+        return joinOperation.join(leftCollection, rightCollection);
     }
 
-
-
+    private static void checkCollectionsForNullValueKey(Collection<DataRow<Integer, String>> leftList, Collection<DataRow<Integer, String>> rightList) {
+        Collection<DataRow<Integer, String>> unitedCollection = Stream.concat(leftList.stream(), rightList.stream()).collect(Collectors.toList());
+        for (DataRow<Integer, String> dataRow : unitedCollection) {
+            if (dataRow.getKey() == null) throw new NullPointerException();
+        }
+    }
 
     public K getKey() {
         return key;
@@ -111,4 +122,5 @@ public class JoinedDataRow<K, V1, V2> {
                 ", secondValue=" + secondValue +
                 '}';
     }
+
 }

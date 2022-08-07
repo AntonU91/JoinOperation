@@ -1,0 +1,2 @@
+public class DataRow2 {
+}
